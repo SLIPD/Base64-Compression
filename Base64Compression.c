@@ -24,6 +24,7 @@ void initialise(){
 	initialised = 1;
 }
 
+
 int stringLength(uint8_t* inputData){
 	int byteNum = 0;
 	int bitNum = 8;
@@ -92,7 +93,7 @@ uint8_t getCharacter(uint8_t index, uint8_t* array, uint8_t arrayLength){
 
 uint8_t* encodedData(uint8_t *string){
     if(!initialised) initialise();
-    int stringBitLength = stringLength(string) * 6;
+    int stringBitLength = strlen((char*)string) * 6;
     int outputLength = (int)ceil((double)stringBitLength / 8.0);
     if(stringBitLength % 8 == 0) outputLength++;
     outputLength++;
@@ -106,7 +107,7 @@ uint8_t* encodedData(uint8_t *string){
     	returnData[i] = '\0';
     }
 
-    for(i = 0; i < stringLength(string); i++){
+    for(i = 0; i < strlen((char*)string); i++){
     	int value = findPosition((string + i),characters,CHARACTERS_LENGTH);
     	if(value == 0xFF) continue;
     	if(bitNum == 8){

@@ -10,6 +10,8 @@ char initialised = 0;
 char *characters;
 
 
+
+
 void initialise(){
 	uint8_t tempChars[] = {'\0',	'A','B','C','D','E','F','G','H',
 									'I','J','K','L','M','N','O','P',
@@ -91,7 +93,7 @@ uint8_t getCharacter(uint8_t index, uint8_t* array, uint8_t arrayLength){
 	return (uint8_t)(*(array + index));
 }
 
-uint8_t* encodedData(uint8_t *string){
+uint8_t* encodeDataString(uint8_t *string){
     if(!initialised) initialise();
     int stringBitLength = strlen((char*)string) * 6;
     int outputLength = (int)ceil((double)stringBitLength / 8.0);
@@ -135,7 +137,7 @@ uint8_t* encodedData(uint8_t *string){
 }
 
 
-uint8_t* decodedData(uint8_t *string){
+uint8_t* decodeDataString(uint8_t *string){
 
     if(!initialised) initialise();
     int stringBitLength = stringLength(string) * 8;
@@ -185,14 +187,44 @@ uint8_t* decodedData(uint8_t *string){
     
 }
 
-int main(int argc, char* argv[]){
-	char *testString;
-	if(argc > 1){
-		testString = argv[1];
-		char *encodedString = encodedData(testString);
-		printHexString(encodedString);
-		char *decodedString = decodedData(encodedString);
-		printf("DECODED STRING: %s\n",decodedString);
+void decodeData(uint8_t* data, char* message, char* debug){
+	uint8_t* decodedData = decodeDataString(data);
+	printf("Decoded data: %s\n",(char*)decodedData);
+	char dataPos = 0;
+	char messagePos = 0;
+	char debugPos = 0;
+	char debugMode = 0;
+	while(dataPos < strlen((char*)decodeData)){
+		if(debugMode){
+			debug[debugPos] = decodedData[dataPos];
+			debugPos++;
+		} else {
+			if(decodedData[dataPos] == '$'){
+				debugMode = 1;
+			} else {
+				message[messagePos] = decodedData[dataPos];
+				messagePos++;
+			}
+		}
+		dataPos++;
 	}
 }
+
+int main(int argc, char* argv[]){
+	uint8_t *testString;
+	if(argc > 1){
+		testString = (uint8_t*)argv[1];
+		printf("Test string: %s, Teststring length: %d\n",(char*)testString,(int)strlen((char*)testString));
+		uint8_t* encodedString = encodeDataString(testString);
+		printHexString(encodedString);
+		char *decodedMessage = calloc(32,1);
+		char *decodedDebug = calloc(31,1);
+		decodeData(encodedString,decodedMessage,decodedDebug);
+		printf("DECODED STRING: %s\n",decodedMessage);
+		printf("DECODED DEBUG: %s\n",decodedDebug);
+		
+	}
+}
+	
+	
 
